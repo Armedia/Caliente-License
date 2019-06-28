@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<name>Caliente License Headers</name>
+	<description>License header files for Caliente</description>
+	<groupId>com.armedia.caliente</groupId>
+	<artifactId>license-headers</artifactId>
+	<version>1.0</version>
+	<packaging>jar</packaging>
+
+	<organization>
+		<name>Armedia</name>
+		<url>http://www.armedia.com</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>drivera</id>
+			<name>Diego Rivera</name>
+			<email>diego.rivera@armedia.com</email>
+			<url>http://www.armedia.com</url>
+			<organization>Armedia, LLC</organization>
+			<organizationUrl>http://www.armedia.com</organizationUrl>
+			<roles>
+				<role>Architect</role>
+				<role>Developer</role>
+			</roles>
+			<timezone>-6</timezone>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git@gitlab.armedia.com:caliente/license-headers.git</connection>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<id>armedia-nexus</id>
+			<name>Armedia Nexus Repository</name>
+			<url>https://project.armedia.com/nexus/content/repositories/armedia.release/</url>
+		</repository>
+	</distributionManagement>
+</project>
