@@ -35,6 +35,11 @@
 		<connection>scm:git:git@gitlab.armedia.com:caliente/license-headers.git</connection>
 	</scm>
 
+	<properties>
+		<maven.min-version>3.3.9</maven.min-version>
+		<build.number>-SNAPSHOT-${scmBranch}-${buildNumber}</build.number>
+	</properties>
+
 	<distributionManagement>
 		<repository>
 			<id>armedia-nexus</id>
@@ -42,4 +47,142 @@
 			<url>https://project.armedia.com/nexus/content/repositories/armedia.release/</url>
 		</repository>
 	</distributionManagement>
+
+	<build>
+		<finalName>${project.groupId}.${project.artifactId}-${project.version}${build.number}</finalName>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>1.4.1</version>
+					<configuration>
+						<rules>
+							<requireMavenVersion>
+								<version>${maven.min-version}</version>
+							</requireMavenVersion>
+						</rules>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>buildnumber-maven-plugin</artifactId>
+					<version>1.4</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.1.1</version>
+					<configuration>
+						<archive>
+							<manifestEntries>
+								<SCM-Branch>${scmBranch}</SCM-Branch>
+								<SCM-Revision>${commitHash}</SCM-Revision>
+								<SCM-Build-Time>${buildTimestamp}</SCM-Build-Time>
+							</manifestEntries>
+						</archive>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>enforce-versions</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>create-commitHash</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+						<configuration>
+							<doCheck>false</doCheck>
+							<doUpdate>false</doUpdate>
+							<shortRevisionLength>40</shortRevisionLength>
+							<getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+							<revisionOnScmFailure>unknown</revisionOnScmFailure>
+							<buildNumberPropertyName>commitHash</buildNumberPropertyName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>create-buildNumber</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+						<configuration>
+							<doCheck>false</doCheck>
+							<doUpdate>false</doUpdate>
+							<shortRevisionLength>8</shortRevisionLength>
+							<getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+							<revisionOnScmFailure>unknown</revisionOnScmFailure>
+							<buildNumberPropertyName>buildNumber</buildNumberPropertyName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>create-buildTimestamp</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>create-timestamp</goal>
+						</goals>
+						<configuration>
+								<timestampPropertyName>buildTimestamp</timestampPropertyName>
+								<timestampFormat>yyyy-MM-dd'T'HH:mm:ssZZ</timestampFormat>
+								<timezone>UTC</timezone>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<properties>
+				<build.number></build.number>
+			</properties>
+		</profile>
+		<profile>
+			<id>beta</id>
+			<properties>
+				<build.number>-beta-${betaNumber}</build.number>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-enforcer-plugin</artifactId>
+						<version>1.4.1</version>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>${maven.min-version}</version>
+								</requireMavenVersion>
+								<requireProperty>
+									<property>betaNumber</property>
+									<message>Must provide a valid betaNumber property (-DbetaNumber=...) for this build</message>
+									<regex>^[0-9]*[1-9]0?$</regex>
+									<regexMessage>The beta number [${betaNumber}] is not composed of all digits, or is not a valid number (it may not be all-zeros, but may have leading zeros)</regexMessage>
+								</requireProperty>
+							</rules>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
